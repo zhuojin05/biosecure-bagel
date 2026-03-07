@@ -1,0 +1,10 @@
+template,signal,auroc
+abeta42,pp_score,nan
+abeta42,max_pp,nan
+abeta42,tps_auc,nan
+asyn_NAC,pp_score,nan
+asyn_NAC,max_pp,nan
+asyn_NAC,tps_auc,nan
+PrP_106-126,pp_score,nan
+PrP_106-126,max_pp,nan
+PrP_106-126,tps_auc,nan

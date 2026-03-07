@@ -23,13 +23,18 @@ from .signals import (
 )
 from .robustness import LocalRobustnessProbe
 from .triage import MultiSignalTriageEngine
+from .tps import TPSCallback, ToxinProximityWalk
+from .pathogenic_potential import BAGELPPScreener
 
 __all__ = [
     'AggregationSignal',
+    'BAGELPPScreener',
     'EmbeddingSignal',
     'LocalRobustnessProbe',
     'MotifDetectionSignal',
     'MultiSignalTriageEngine',
     'SequenceHomologySignal',
     'StructuralPropensitySignal',
+    'TPSCallback',
+    'ToxinProximityWalk',
 ]

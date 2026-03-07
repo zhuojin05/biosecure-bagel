@@ -44,12 +44,23 @@ class MultiSignalTriageEngine:
         Number of single-residue perturbations for robustness probing.
     """
 
+    # Default signal weights.  Homology is weighted 3x motif because the
+    # sequence-homology signal is a strong discriminator while the motif
+    # signal captures complementary but noisier features.
+    DEFAULT_SIGNAL_WEIGHTS: dict[str, float] = {
+        'homology': 0.75,
+        'motif': 0.25,
+        'structure': 1.0,
+        'embedding': 1.0,
+    }
+
     def __init__(
         self,
         esmfold: FoldingOracle | None = None,
         esm2: EmbeddingOracle | None = None,
         use_modal: bool = False,
         n_perturbations: int = 30,
+        signal_weights: dict[str, float] | None = None,
     ) -> None:
         self.fast_signals: dict[str, AggregationSignal] = {
             'homology': SequenceHomologySignal(),
@@ -63,6 +74,7 @@ class MultiSignalTriageEngine:
 
         self.probe = LocalRobustnessProbe()
         self.n_perturbations = n_perturbations
+        self.signal_weights: dict[str, float] = signal_weights if signal_weights is not None else dict(self.DEFAULT_SIGNAL_WEIGHTS)
 
     def assess_risk(self, sequence: str) -> dict:
         """
@@ -90,7 +102,12 @@ class MultiSignalTriageEngine:
         for name in self.slow_signals:
             robustness_scores[name] = 1.0
 
-        combined = float(np.mean([signal_scores[n] * (1.0 + robustness_scores[n]) for n in all_signals]))
+        weights = {n: self.signal_weights.get(n, 1.0) for n in all_signals}
+        total_weight = sum(weights.values())
+        combined = float(
+            sum(weights[n] * signal_scores[n] * (1.0 + robustness_scores[n]) for n in all_signals)
+            / total_weight
+        )
 
         if combined > 1.2:
             risk_level = 'HIGH'

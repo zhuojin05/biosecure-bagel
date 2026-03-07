@@ -277,8 +277,8 @@ class TestEmbeddingSignal:
         score = sig.score('ACDEF')
         assert 0.0 <= score <= 1.0
 
-    def test_identical_to_reference_scores_low(self, fake_esm2: bg.oracles.embedding.ESM2, monkeypatch):
-        """A sequence whose embedding is identical to a reference gets low score (1-1=0)."""
+    def test_identical_to_reference_scores_high(self, fake_esm2: bg.oracles.embedding.ESM2, monkeypatch):
+        """A sequence whose embedding is identical to a reference gets high score (max_sim=1.0)."""
         n_features = 8
         # Construct a unit-norm reference embedding
         ref_vec = np.ones(n_features, dtype=np.float64)
@@ -299,8 +299,8 @@ class TestEmbeddingSignal:
 
         sig = EmbeddingSignal(oracle=fake_esm2, reference_embeddings=ref_embs)
         score = sig.score('ACDEF')
-        # max cosine similarity = 1.0 → score = 1.0 - 1.0 = 0.0
-        assert np.isclose(score, 0.0, atol=1e-5)
+        # max cosine similarity = 1.0 → score = 1.0
+        assert np.isclose(score, 1.0, atol=1e-5)
 
     def test_zero_embedding_returns_half(self, fake_esm2: bg.oracles.embedding.ESM2, monkeypatch):
         """If the oracle returns all-zero embeddings, mean is zero and score is 0.5."""

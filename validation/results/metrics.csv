@@ -1,0 +1,4 @@
+signal,auroc,auprc
+combined,0.8600,0.7840
+homology,0.9400,0.8147
+motif,0.4133,0.3822

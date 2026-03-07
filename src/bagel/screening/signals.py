@@ -271,7 +271,7 @@ class EmbeddingSignal(AggregationSignal):
     query sequence's mean ESM2 embedding and pre-computed reference embeddings
     from known aggregating sequences.
 
-    score = 1.0 - max(cosine_similarity(query_emb, ref_emb_i))
+    score = max(cosine_similarity(query_emb, ref_emb_i))
             for i in reference rows
 
     NOT used inside the LocalRobustnessProbe to keep robustness probing cheap.
@@ -309,5 +309,5 @@ class EmbeddingSignal(AggregationSignal):
         # cosine similarity against each reference row (already L2-normalised)
         similarities = self._reference_embeddings @ query_emb
         max_sim = float(np.max(similarities))
-        raw = 1.0 - max_sim
+        raw = max_sim
         return float(np.clip(raw, 0.0, 1.0))

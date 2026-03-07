@@ -68,8 +68,8 @@ def test_engine_with_esm2_adds_embedding_signal(fake_esm2, tmp_path):
 def test_assess_risk_combined_score_formula():
     """
     Test the combined score formula:
-        combined = mean(signal_scores[n] * (1 + robustness_scores[n]))
-    using known mock values.
+        combined = sum(w[n] * signal_scores[n] * (1 + robustness_scores[n])) / sum(w)
+    using known mock values and the engine's default signal weights.
     """
     engine = MultiSignalTriageEngine(n_perturbations=5)
 
@@ -84,12 +84,11 @@ def test_assess_risk_combined_score_formula():
 
     result = engine.assess_risk(_SEQ)
 
-    expected_combined = np.mean(
-        [
-            0.6 * (1.0 + 0.8),  # homology: 0.6 * 1.8 = 1.08
-            0.4 * (1.0 + 0.5),  # motif: 0.4 * 1.5 = 0.6
-        ]
-    )
+    w_h = engine.signal_weights['homology']
+    w_m = engine.signal_weights['motif']
+    expected_combined = (
+        w_h * 0.6 * (1.0 + 0.8) + w_m * 0.4 * (1.0 + 0.5)
+    ) / (w_h + w_m)
     assert np.isclose(result['combined_score'], expected_combined), (
         f'Expected {expected_combined}, got {result["combined_score"]}'
     )
